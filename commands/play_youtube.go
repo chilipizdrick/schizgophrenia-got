@@ -1,12 +1,12 @@
 package commands
 
 import (
+	"fmt"
 	"log"
 	"os"
+	"os/exec"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/lithdew/nicehttp"
-	"github.com/lithdew/youtube"
 )
 
 var PlayYoutubeCommand = SlashCommand{
@@ -26,21 +26,11 @@ var PlayYoutubeCommand = SlashCommand{
 
 		const TEMP_AUDIO_FILE_LOCATION = "./temp/audio/youtube/"
 
-		log.Println("[TRACE] Running /playtube...")
+		// log.Println("[TRACE] Running /playtube...")
 
-		// Fetch member's voice channel (requires s.StateEnabled to be true)
-		// log.Printf("[TRACE] Guild ID: %v", i.GuildID)
-		// log.Printf("[TRACE] User ID: %v", i.Member.User.ID)
-		voiceState, err := s.State.VoiceState(i.GuildID, i.Member.User.ID)
+		voiceChannelID, err := getInteractionVoiceChannelID(s, i)
 		if err != nil {
 			log.Printf("[ERROR] %v", err)
-			respondToInteractionWithString(s, i.Interaction, "Could not get user's current voice channel data!")
-			return
-		}
-		voiceChannelID := voiceState.ChannelID
-		// log.Printf("[TRACE] Voice channel ID: %v", voiceChannelID)
-		if voiceChannelID == "" {
-			respondToInteractionWithString(s, i.Interaction, "This command can only be used in a voice channel!")
 			return
 		}
 
@@ -48,46 +38,7 @@ var PlayYoutubeCommand = SlashCommand{
 		optionMap := getOptionMap(i)
 		query, ok := optionMap["query"]
 		if !ok {
-			respondToInteractionWithString(s, i.Interaction, "No search query has been provided!")
-			return
-		}
-		// log.Printf("[TRACE] YouTube query: %v", link.StringValue())
-
-		// Search youtube with provided query
-		results, err := youtube.Search(query.StringValue(), 0)
-		if err != nil {
-			log.Printf("[ERROR] Could not load youtube search results. %v", err)
-			respondToInteractionWithString(s, i.Interaction, "Could not load youtube video!")
-			return
-		}
-
-		if len(results.Items) == 0 {
-			respondToInteractionWithString(s, i.Interaction, "Found no videos with provided query!")
-			return
-		}
-
-		details := results.Items[0]
-		log.Printf("[TRACE] Video details: %v", details)
-		player, err := youtube.Load(details.ID)
-		if err != nil {
-			log.Printf("[ERROR] Could not load video player. %v", err)
-			respondToInteractionWithString(s, i.Interaction, "Could not download youtube audio!")
-			return
-		}
-
-		stream, ok := player.SourceFormats().AudioOnly().BestAudio()
-		if !ok {
-			log.Printf("[ERROR] Could not get audio stream. %v", err)
-			respondToInteractionWithString(s, i.Interaction, "Could not download youtube audio!")
-			return
-		}
-
-		// filename := "temp_youtube_audio." + stream.FileExtension()
-
-		url, err := player.ResolveURL(stream)
-		if err != nil {
-			log.Printf("[ERROR] Could not resolve audio stream url. %v", err)
-			respondToInteractionWithString(s, i.Interaction, "Could not download youtube audio!")
+			respondToInteractionCreateWithString(s, i, "No search query has been provided!")
 			return
 		}
 
@@ -96,31 +47,54 @@ var PlayYoutubeCommand = SlashCommand{
 		if os.IsNotExist(err) {
 			err = os.MkdirAll(TEMP_AUDIO_FILE_LOCATION, os.ModePerm)
 			if err != nil {
-				respondToInteractionWithString(s, i.Interaction, "Could not download youtube audio!")
+				log.Printf("[ERROR] %v", err)
+				respondToInteractionCreateWithString(s, i, "Could not download youtube audio!")
 				return
 			}
 		}
 
-		filename := "temp_youtube_audio." + stream.FileExtension()
-		filepath := TEMP_AUDIO_FILE_LOCATION + filename
-
-		err = nicehttp.DownloadFile(filepath, url)
+		// Download youtube video
+		log.Printf("[TRACE] Downloading youtube audio...")
+		filepath := TEMP_AUDIO_FILE_LOCATION + "temp_audio.opus"
+		err = downloadVideoWithYTDL(filepath, query.StringValue())
 		if err != nil {
-			log.Printf("[ERROR] Could not download youtube video. %v", err)
-			respondToInteractionWithString(s, i.Interaction, "Could not download youtube audio!")
+			log.Printf("[ERROR] %v", err)
+			respondToInteractionCreateWithString(s, i, "Could not download youtube audio!")
 			return
 		}
 
 		audioBuffer := make([][]byte, 0)
 
-		err = loadAudioFile(filepath, &audioBuffer)
+		log.Printf("[TRACE] Reading opus audio ...")
+		err = loadOpusFile(filepath, &audioBuffer)
 		if err != nil {
-			respondToInteractionWithString(s, i.Interaction, "Could not load audio file!")
+			log.Printf("[ERROR] %v", err)
+			respondToInteractionCreateWithString(s, i, "Could not load audio file!")
 			return
 		}
 
-		playSound(s, i.GuildID, voiceChannelID, audioBuffer)
+		err = playAudio(s, i.GuildID, voiceChannelID, audioBuffer)
+		if err != nil {
+			log.Printf("[ERROR] %v", err)
+			respondToInteractionCreateWithString(s, i, "Could not connect to voive channel!")
+			return
+		}
 	},
+}
+
+func downloadVideoWithYTDL(filepath, query string) error {
+
+	command := "youtube-dl"
+	command += fmt.Sprintf(" --output \"%v\"", filepath)
+	command += " --extract-audio"
+	command += " --audio-format opus"
+	// command += " --geo-bypass"
+
+	command += fmt.Sprintf(" \"ytsearch1:%v\"", query)
+
+	cmd := exec.Command("bash", "-c", command)
+	err := cmd.Run() // waits until the commands runs and finishes
+	return err
 }
 
 // func parseYouTubeLink(link string) (string, error) {
@@ -136,5 +110,5 @@ var PlayYoutubeCommand = SlashCommand{
 // 		return link[videoIDIndex : videoIDIndex+11], nil
 // 	}
 
-// 	return "", errors.New("parse error: Invalid youtube link")
+// 	return "", errors.New("parse error: invalid youtube link")
 // }
