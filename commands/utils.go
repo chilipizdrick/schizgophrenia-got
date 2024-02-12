@@ -97,6 +97,9 @@ func playAudio(s *discordgo.Session, guildID string, channelID string, buffer []
 	vc.Speaking(false)
 	time.Sleep(250 * time.Millisecond)
 	vc.Disconnect()
+	if err != nil {
+		return fmt.Errorf("error on voiceChannnel.Disconect: %w", err)
+	}
 
 	return nil
 }
@@ -128,7 +131,7 @@ func genericVoiceCommandHandler(filepath string) func(s *discordgo.Session, i *d
 		err = playAudio(s, i.GuildID, voiceChannelID, audioBuffer)
 		if err != nil {
 			log.Printf("[ERROR] %v", err)
-			editResponseWithString(s, i, "Could not connect to voice channel!")
+			// editResponseWithString(s, i, "Could not connect to voice channel or disconnect from it!")
 			return
 		}
 	}
