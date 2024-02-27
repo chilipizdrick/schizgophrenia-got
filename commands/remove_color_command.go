@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/bwmarrin/discordgo"
+	discord "github.com/bwmarrin/discordgo"
 )
 
 var RemoveColorCommand = SlashCommand{
-	CommandData: &discordgo.ApplicationCommand{
+	CommandData: &discord.ApplicationCommand{
 		Name:        "remove-color",
 		Description: "Removes user's personal color role",
 	},
-	CommandHandler: func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	CommandHandler: func(s *discord.Session, i *discord.InteractionCreate) {
 
 		userID := i.Member.User.ID
 
@@ -23,7 +23,7 @@ var RemoveColorCommand = SlashCommand{
 			return
 		}
 
-		var personalRole *discordgo.Role
+		var personalRole *discord.Role
 		for _, role := range guildRoles {
 			if role.Name == userID {
 				personalRole = role

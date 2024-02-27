@@ -1,16 +1,16 @@
 package commands
 
-import "github.com/bwmarrin/discordgo"
+import discord "github.com/bwmarrin/discordgo"
 
 var PingCommand = SlashCommand{
-	CommandData: &discordgo.ApplicationCommand{
+	CommandData: &discord.ApplicationCommand{
 		Name:        "ping",
 		Description: "Replies with \"Pong!\"",
 	},
-	CommandHandler: func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
+	CommandHandler: func(s *discord.Session, i *discord.InteractionCreate) {
+		s.InteractionRespond(i.Interaction, &discord.InteractionResponse{
+			Type: discord.InteractionResponseChannelMessageWithSource,
+			Data: &discord.InteractionResponseData{
 				Content: "Pong!",
 			},
 		})

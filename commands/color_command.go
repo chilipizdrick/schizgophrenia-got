@@ -6,24 +6,24 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/bwmarrin/discordgo"
+	discord "github.com/bwmarrin/discordgo"
 	"github.com/thoas/go-funk"
 )
 
 var ColorCommand = SlashCommand{
-	CommandData: &discordgo.ApplicationCommand{
+	CommandData: &discord.ApplicationCommand{
 		Name:        "color",
 		Description: "Changes user's personal role color",
-		Options: []*discordgo.ApplicationCommandOption{
+		Options: []*discord.ApplicationCommandOption{
 			{
-				Type:        discordgo.ApplicationCommandOptionString,
+				Type:        discord.ApplicationCommandOptionString,
 				Name:        "color",
 				Description: "New role color in HEX format",
 				Required:    true,
 			},
 		},
 	},
-	CommandHandler: func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	CommandHandler: func(s *discord.Session, i *discord.InteractionCreate) {
 
 		userID := i.Member.User.ID
 		guildRoles, err := s.GuildRoles(i.GuildID)
@@ -33,15 +33,15 @@ var ColorCommand = SlashCommand{
 			return
 		}
 
-		var personalRole *discordgo.Role
-		if !funk.Contains(funk.Map(guildRoles, func(role *discordgo.Role) string {
+		var personalRole *discord.Role
+		if !funk.Contains(funk.Map(guildRoles, func(role *discord.Role) string {
 			return role.Name
 		}), userID) {
 			permissions := int64(0)
 			hoist := false
 			mentionable := false
 
-			personalRole, err = s.GuildRoleCreate(i.GuildID, &discordgo.RoleParams{
+			personalRole, err = s.GuildRoleCreate(i.GuildID, &discord.RoleParams{
 				Name:        userID,
 				Permissions: &permissions,
 				Hoist:       &hoist,
@@ -56,7 +56,7 @@ var ColorCommand = SlashCommand{
 			s.GuildMemberRoleAdd(i.GuildID, userID, personalRole.ID)
 		}
 
-		// If role has not been created then fetch it
+		// If role has not been created (already existed) then fetch it
 		if personalRole == nil {
 			for _, role := range guildRoles {
 				if role.Name == userID {
@@ -78,7 +78,7 @@ var ColorCommand = SlashCommand{
 
 		intColor := int(uIntColor)
 
-		s.GuildRoleEdit(i.GuildID, personalRole.ID, &discordgo.RoleParams{
+		s.GuildRoleEdit(i.GuildID, personalRole.ID, &discord.RoleParams{
 			Color: &intColor,
 		})
 

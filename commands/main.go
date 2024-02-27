@@ -1,10 +1,10 @@
 package commands
 
-import "github.com/bwmarrin/discordgo"
+import discord "github.com/bwmarrin/discordgo"
 
 type SlashCommand struct {
-	CommandData    *discordgo.ApplicationCommand
-	CommandHandler func(*discordgo.Session, *discordgo.InteractionCreate)
+	CommandData    *discord.ApplicationCommand
+	CommandHandler func(*discord.Session, *discord.InteractionCreate)
 }
 
 var (

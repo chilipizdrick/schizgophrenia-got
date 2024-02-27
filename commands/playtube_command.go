@@ -6,23 +6,23 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/bwmarrin/discordgo"
+	discord "github.com/bwmarrin/discordgo"
 )
 
 var PlayYoutubeCommand = SlashCommand{
-	CommandData: &discordgo.ApplicationCommand{
+	CommandData: &discord.ApplicationCommand{
 		Name:        "playtube",
 		Description: "Plays Youtube video.",
-		Options: []*discordgo.ApplicationCommandOption{
+		Options: []*discord.ApplicationCommandOption{
 			{
-				Type:        discordgo.ApplicationCommandOptionString,
+				Type:        discord.ApplicationCommandOptionString,
 				Name:        "query",
 				Description: "YouTube search query",
 				Required:    true,
 			},
 		},
 	},
-	CommandHandler: func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	CommandHandler: func(s *discord.Session, i *discord.InteractionCreate) {
 
 		const TEMP_AUDIO_FILE_LOCATION = "./temp/audio/youtube/"
 

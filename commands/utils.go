@@ -8,38 +8,38 @@ import (
 	"os"
 	"time"
 
-	"github.com/bwmarrin/discordgo"
+	discord "github.com/bwmarrin/discordgo"
 	"github.com/pion/opus/pkg/oggreader"
 )
 
-func getOptionMap(i *discordgo.InteractionCreate) map[string]*discordgo.ApplicationCommandInteractionDataOption {
+func getOptionMap(i *discord.InteractionCreate) map[string]*discord.ApplicationCommandInteractionDataOption {
 
 	options := i.ApplicationCommandData().Options
-	optionMap := make(map[string]*discordgo.ApplicationCommandInteractionDataOption, len(options))
+	optionMap := make(map[string]*discord.ApplicationCommandInteractionDataOption, len(options))
 	for _, opt := range options {
 		optionMap[opt.Name] = opt
 	}
 	return optionMap
 }
 
-func respondToInteractionCreateWithString(s *discordgo.Session, i *discordgo.InteractionCreate, message string) {
+func respondToInteractionCreateWithString(s *discord.Session, i *discord.InteractionCreate, message string) {
 
-	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-		Type: discordgo.InteractionResponseChannelMessageWithSource,
-		Data: &discordgo.InteractionResponseData{
+	s.InteractionRespond(i.Interaction, &discord.InteractionResponse{
+		Type: discord.InteractionResponseChannelMessageWithSource,
+		Data: &discord.InteractionResponseData{
 			Content: message,
 		},
 	})
 }
 
-func editResponseWithString(s *discordgo.Session, i *discordgo.InteractionCreate, message string) {
+func editResponseWithString(s *discord.Session, i *discord.InteractionCreate, message string) {
 
-	s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+	s.InteractionResponseEdit(i.Interaction, &discord.WebhookEdit{
 		Content: &message,
 	})
 }
 
-func getInteractionVoiceChannelID(s *discordgo.Session, i *discordgo.InteractionCreate) (string, error) {
+func getInteractionVoiceChannelID(s *discord.Session, i *discord.InteractionCreate) (string, error) {
 
 	voiceState, err := s.State.VoiceState(i.GuildID, i.Member.User.ID)
 	if err != nil {
@@ -81,7 +81,7 @@ func loadOpusFile(filepath string, buffer *[][]byte) error {
 	}
 }
 
-func playAudio(s *discordgo.Session, guildID string, channelID string, buffer [][]byte) (err error) {
+func playAudio(s *discord.Session, guildID string, channelID string, buffer [][]byte) (err error) {
 
 	vc, err := s.ChannelVoiceJoin(guildID, channelID, false, true)
 	if err != nil {
@@ -96,7 +96,7 @@ func playAudio(s *discordgo.Session, guildID string, channelID string, buffer []
 
 	vc.Speaking(false)
 	time.Sleep(250 * time.Millisecond)
-	vc.Disconnect()
+	err = vc.Disconnect()
 	if err != nil {
 		return fmt.Errorf("error on voiceChannnel.Disconect: %w", err)
 	}
@@ -104,12 +104,12 @@ func playAudio(s *discordgo.Session, guildID string, channelID string, buffer []
 	return nil
 }
 
-func genericVoiceCommandHandler(filepath string) func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+func genericVoiceCommandHandler(filepath string) func(s *discord.Session, i *discord.InteractionCreate) {
 
-	return func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	return func(s *discord.Session, i *discord.InteractionCreate) {
 
-		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
+		s.InteractionRespond(i.Interaction, &discord.InteractionResponse{
+			Type: discord.InteractionResponseDeferredChannelMessageWithSource,
 		})
 
 		defer s.InteractionResponseDelete(i.Interaction)
@@ -140,7 +140,7 @@ func genericVoiceCommandHandler(filepath string) func(s *discordgo.Session, i *d
 func genericVoiceCommand(name, description, filepath string) SlashCommand {
 
 	return SlashCommand{
-		CommandData: &discordgo.ApplicationCommand{
+		CommandData: &discord.ApplicationCommand{
 			Name:        name,
 			Description: description,
 		},

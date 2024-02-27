@@ -8,8 +8,9 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/bwmarrin/discordgo"
+	discord "github.com/bwmarrin/discordgo"
 	"github.com/joho/godotenv"
+	"github.com/thoas/go-funk"
 
 	"github.com/chilipizdrick/schizgophrenia-got/commands"
 	"github.com/chilipizdrick/schizgophrenia-got/events"
@@ -30,13 +31,13 @@ func init() {
 func main() {
 
 	// Initialise new discord bot session
-	s, err := discordgo.New("Bot " + os.Getenv("CLIENT_TOKEN"))
+	s, err := discord.New("Bot " + os.Getenv("CLIENT_TOKEN"))
 	if err != nil {
 		log.Fatalln("[FATAL] Could not create Discord Bot session.", err)
 	}
 
 	// Set intents
-	s.Identify.Intents = discordgo.IntentsAll
+	s.Identify.Intents = discord.IntentsAll
 
 	// Setup state tracking
 	s.StateEnabled = true
@@ -50,7 +51,7 @@ func main() {
 
 	// Add command handlers
 	log.Println("[INFO] Adding command handlers...")
-	s.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	s.AddHandler(func(s *discord.Session, i *discord.InteractionCreate) {
 		if c, ok := commands.SlashCommands[i.ApplicationCommandData().Name]; ok {
 			c.CommandHandler(s, i)
 		}
@@ -64,7 +65,7 @@ func main() {
 
 	// Register commands
 	log.Println("[INFO] Registering commands...")
-	var registeredCommands []*discordgo.ApplicationCommand
+	var registeredCommands []*discord.ApplicationCommand
 	guildId := os.Getenv("GUILD_ID")
 	for _, v := range commands.SlashCommands {
 		cmd, err := s.ApplicationCommandCreate(s.State.User.ID, guildId, v.CommandData)
@@ -95,7 +96,8 @@ func main() {
 	<-sc
 
 	// Remove registered commands
-	if os.Getenv("REMOVE_COMMANDS") == "1" || strings.ToLower(os.Getenv("REMOVE_COMMANDS")) == "true" {
+	removeCommandsFlag := strings.ToLower(os.Getenv("REMOVE_COMMANDS"))
+	if funk.Contains([]string{"1", "yes", "on", "true"}, removeCommandsFlag) {
 		log.Println("[INFO] Removing commands...")
 		for _, v := range registeredCommands {
 			err := s.ApplicationCommandDelete(s.State.User.ID, guildId, v.ID)
