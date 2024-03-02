@@ -25,7 +25,6 @@ var ColorCommand = utl.SlashCommand{
 		},
 	},
 	CommandHandler: func(s *discord.Session, i *discord.InteractionCreate) {
-
 		userID := i.Member.User.ID
 		guildRoles, err := s.GuildRoles(i.GuildID)
 		if err != nil {

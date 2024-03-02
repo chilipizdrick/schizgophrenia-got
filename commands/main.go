@@ -6,9 +6,10 @@ import (
 
 var (
 	SlashCommands = map[string]utl.SlashCommand{
-		PingCommand.CommandData.Name:        PingCommand,
-		ColorCommand.CommandData.Name:       ColorCommand,
-		RemoveColorCommand.CommandData.Name: RemoveColorCommand,
+		PingCommand.CommandData.Name:             PingCommand,
+		ColorCommand.CommandData.Name:            ColorCommand,
+		RemoveColorCommand.CommandData.Name:      RemoveColorCommand,
+		RegisterBirthdayCommand.CommandData.Name: RegisterBirthdayCommand,
 
 		// Generic voice commands
 		"pipe":   utl.GenericVoiceCommand("pipe", "Plays metal pipe sound", "./assets/audio/voice/pipe.ogg"),
