@@ -1,8 +1,11 @@
 package commands
 
-import discord "github.com/bwmarrin/discordgo"
+import (
+	discord "github.com/bwmarrin/discordgo"
+	utl "github.com/chilipizdrick/schizgophrenia-got/utils"
+)
 
-var PingCommand = SlashCommand{
+var PingCommand = utl.SlashCommand{
 	CommandData: &discord.ApplicationCommand{
 		Name:        "ping",
 		Description: "Replies with \"Pong!\"",

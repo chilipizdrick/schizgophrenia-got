@@ -7,10 +7,11 @@ import (
 	"strings"
 
 	discord "github.com/bwmarrin/discordgo"
+	utl "github.com/chilipizdrick/schizgophrenia-got/utils"
 	"github.com/thoas/go-funk"
 )
 
-var ColorCommand = SlashCommand{
+var ColorCommand = utl.SlashCommand{
 	CommandData: &discord.ApplicationCommand{
 		Name:        "color",
 		Description: "Changes user's personal role color",
@@ -28,7 +29,7 @@ var ColorCommand = SlashCommand{
 		userID := i.Member.User.ID
 		guildRoles, err := s.GuildRoles(i.GuildID)
 		if err != nil {
-			respondToInteractionCreateWithString(s, i, "Could not get server roles.")
+			utl.RespondToInteractionCreateWithString(s, i, "Could not get server roles.")
 			log.Printf("[ERROR] Error fetching guild roles by guildID. %v", err)
 			return
 		}
@@ -49,7 +50,7 @@ var ColorCommand = SlashCommand{
 			})
 			if err != nil {
 				log.Printf("[ERROR] Error creating new personal user's role. %v", err)
-				respondToInteractionCreateWithString(s, i, "Could not create user's personal role.")
+				utl.RespondToInteractionCreateWithString(s, i, "Could not create user's personal role.")
 				return
 			}
 
@@ -66,12 +67,12 @@ var ColorCommand = SlashCommand{
 			}
 		}
 
-		optionMap := getOptionMap(i)
+		optionMap := utl.GetOptionMap(i)
 		colorField := optionMap["color"].StringValue()
 		cleanedHexColor := strings.Replace(colorField, "#", "", -1)
 		uIntColor, err := strconv.ParseUint(cleanedHexColor, 16, 64)
 		if err != nil {
-			respondToInteractionCreateWithString(s, i, "Invalid color in HEX format has been provided.")
+			utl.RespondToInteractionCreateWithString(s, i, "Invalid color in HEX format has been provided.")
 			log.Printf("[ERROR] Error parsing hexidecimal color. %v", err)
 			return
 		}
@@ -82,6 +83,6 @@ var ColorCommand = SlashCommand{
 			Color: &intColor,
 		})
 
-		respondToInteractionCreateWithString(s, i, fmt.Sprintf("Successfully updated %v's personal role color.", i.Member.Mention()))
+		utl.RespondToInteractionCreateWithString(s, i, fmt.Sprintf("Successfully updated %v's personal role color.", i.Member.Mention()))
 	},
 }

@@ -5,9 +5,10 @@ import (
 	"log"
 
 	discord "github.com/bwmarrin/discordgo"
+	utl "github.com/chilipizdrick/schizgophrenia-got/utils"
 )
 
-var RemoveColorCommand = SlashCommand{
+var RemoveColorCommand = utl.SlashCommand{
 	CommandData: &discord.ApplicationCommand{
 		Name:        "remove-color",
 		Description: "Removes user's personal color role",
@@ -18,7 +19,7 @@ var RemoveColorCommand = SlashCommand{
 
 		guildRoles, err := s.GuildRoles(i.GuildID)
 		if err != nil {
-			respondToInteractionCreateWithString(s, i, "Could not get server roles.")
+			utl.RespondToInteractionCreateWithString(s, i, "Could not get server roles.")
 			log.Printf("[ERROR] Error fetching guild roles by guildID. %v", err)
 			return
 		}
@@ -31,12 +32,12 @@ var RemoveColorCommand = SlashCommand{
 			}
 		}
 		if personalRole == nil {
-			respondToInteractionCreateWithString(s, i, "User has no personal role.")
+			utl.RespondToInteractionCreateWithString(s, i, "User has no personal role.")
 			return
 		}
 
 		s.GuildRoleDelete(i.GuildID, personalRole.ID)
 
-		respondToInteractionCreateWithString(s, i, fmt.Sprintf("Successfully deleted %v's personal color role.", i.Member.Mention()))
+		utl.RespondToInteractionCreateWithString(s, i, fmt.Sprintf("Successfully deleted %v's personal color role.", i.Member.Mention()))
 	},
 }

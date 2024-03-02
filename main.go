@@ -26,10 +26,13 @@ func init() {
 	if os.Getenv("CLIENT_TOKEN") == "" {
 		log.Fatalln("[FATAL] Could not read CLIENT_TOKEN from the .env file.")
 	}
+
+	if os.Getenv("CLIENT_ID") == "" {
+		log.Fatalln("[FATAL] Could not read CLIENT_ID from the .env file.")
+	}
 }
 
 func main() {
-
 	// Initialise new discord bot session
 	s, err := discord.New("Bot " + os.Getenv("CLIENT_TOKEN"))
 	if err != nil {
@@ -64,19 +67,22 @@ func main() {
 	}
 
 	// Register commands
-	log.Println("[INFO] Registering commands...")
-	var registeredCommands []*discord.ApplicationCommand
-	guildId := os.Getenv("GUILD_ID")
-	for _, v := range commands.SlashCommands {
-		cmd, err := s.ApplicationCommandCreate(s.State.User.ID, guildId, v.CommandData)
-		if err != nil {
-			log.Panicf("[ERROR] Cannot create '%v' command: %v", v.CommandData.Name, err)
+	registerCommandsFlag := strings.ToLower(os.Getenv("REGISTER_COMMANDS"))
+	if funk.Contains([]string{"1", "yes", "on", "true"}, registerCommandsFlag) {
+		log.Println("[INFO] Registering commands...")
+		var registeredCommands []*discord.ApplicationCommand
+		guildId := os.Getenv("GUILD_ID")
+		for _, v := range commands.SlashCommands {
+			cmd, err := s.ApplicationCommandCreate(s.State.User.ID, guildId, v.CommandData)
+			if err != nil {
+				log.Panicf("[ERROR] Cannot create '%v' command: %v", v.CommandData.Name, err)
+			}
+			registeredCommands = append(registeredCommands, cmd)
 		}
-		registeredCommands = append(registeredCommands, cmd)
-	}
-	log.Println("[INFO] Registered commands:")
-	for _, v := range registeredCommands {
-		log.Printf("[INFO] /%v", v.Name)
+		log.Println("[INFO] Registered commands:")
+		for _, v := range registeredCommands {
+			log.Printf("[INFO] /%v", v.Name)
+		}
 	}
 
 	// Close connection when process exits
@@ -99,10 +105,18 @@ func main() {
 	removeCommandsFlag := strings.ToLower(os.Getenv("REMOVE_COMMANDS"))
 	if funk.Contains([]string{"1", "yes", "on", "true"}, removeCommandsFlag) {
 		log.Println("[INFO] Removing commands...")
+
+		registeredCommands, err := s.ApplicationCommands(os.Getenv("CLIENT_ID"), os.Getenv("GUILD_ID"))
+		if err != nil {
+			log.Panicf("[ERROR] Could not fetch registered commands: %v", err)
+			return
+		}
+
 		for _, v := range registeredCommands {
+			guildId := os.Getenv("GUILD_ID")
 			err := s.ApplicationCommandDelete(s.State.User.ID, guildId, v.ID)
 			if err != nil {
-				log.Panicf("[ERROR] Cannot delete '%v' command: %v", v.Name, err)
+				log.Panicf("[ERROR] Could not delete '%v' command: %v", v.Name, err)
 			}
 		}
 	}

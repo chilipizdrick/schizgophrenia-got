@@ -1,21 +1,18 @@
 package commands
 
-import discord "github.com/bwmarrin/discordgo"
-
-type SlashCommand struct {
-	CommandData    *discord.ApplicationCommand
-	CommandHandler func(*discord.Session, *discord.InteractionCreate)
-}
+import (
+	utl "github.com/chilipizdrick/schizgophrenia-got/utils"
+)
 
 var (
-	SlashCommands = map[string]SlashCommand{
+	SlashCommands = map[string]utl.SlashCommand{
 		PingCommand.CommandData.Name:        PingCommand,
 		ColorCommand.CommandData.Name:       ColorCommand,
 		RemoveColorCommand.CommandData.Name: RemoveColorCommand,
-		PlayYoutubeCommand.CommandData.Name: PlayYoutubeCommand,
+
 		// Generic voice commands
-		"pipe":   genericVoiceCommand("pipe", "Plays metal pipe sound", "./assets/audio/voice/pipe.ogg"),
-		"fontan": genericVoiceCommand("fontan", "Plays \"Chocoladniy Fontan\"", "./assets/audio/voice/fontan.ogg"),
-		"women":  genericVoiceCommand("women", "Plays women", "./assets/audio/voice/women.ogg"),
+		"pipe":   utl.GenericVoiceCommand("pipe", "Plays metal pipe sound", "./assets/audio/voice/pipe.ogg"),
+		"fontan": utl.GenericVoiceCommand("fontan", "Plays \"Chocoladniy Fontan\"", "./assets/audio/voice/fontan.ogg"),
+		"women":  utl.GenericVoiceCommand("women", "Plays women", "./assets/audio/voice/women.ogg"),
 	}
 )
