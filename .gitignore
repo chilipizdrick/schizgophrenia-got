@@ -23,3 +23,4 @@ go.work
 
 .env
 assets/
+# userdata.sqlite3.db
