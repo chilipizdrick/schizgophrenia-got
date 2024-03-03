@@ -71,9 +71,9 @@ func main() {
 	if funk.Contains([]string{"1", "yes", "on", "true"}, registerCommandsFlag) {
 		log.Println("[INFO] Registering commands...")
 		var registeredCommands []*discord.ApplicationCommand
-		guildId := os.Getenv("GUILD_ID")
+		guildID := os.Getenv("GUILD_ID")
 		for _, v := range commands.SlashCommands {
-			cmd, err := s.ApplicationCommandCreate(s.State.User.ID, guildId, v.CommandData)
+			cmd, err := s.ApplicationCommandCreate(s.State.User.ID, guildID, v.CommandData)
 			if err != nil {
 				log.Panicf("[ERROR] Cannot create '%v' command: %v", v.CommandData.Name, err)
 			}
@@ -113,8 +113,8 @@ func main() {
 		}
 
 		for _, v := range registeredCommands {
-			guildId := os.Getenv("GUILD_ID")
-			err := s.ApplicationCommandDelete(s.State.User.ID, guildId, v.ID)
+			guildID := os.Getenv("GUILD_ID")
+			err := s.ApplicationCommandDelete(s.State.User.ID, guildID, v.ID)
 			if err != nil {
 				log.Panicf("[ERROR] Could not delete '%v' command: %v", v.Name, err)
 			}

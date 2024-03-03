@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"math/rand"
 	"os"
 	"strconv"
 	"time"
@@ -211,15 +210,10 @@ func congratulate(s *discord.Session, e *discord.VoiceStateUpdate) error {
 	const BIRTHDAY_DIR_PATH = "./assets/audio/birthday/"
 
 	// Pick random file from directory
-	files, err := os.ReadDir(BIRTHDAY_DIR_PATH)
+	filename, err := utl.PickRandomFileFromDirectory(BIRTHDAY_DIR_PATH)
 	if err != nil {
-		return fmt.Errorf("error reading directory: %v", err)
+		return fmt.Errorf("error picking random file from directory: %v", err)
 	}
-	var filenames []string
-	for _, file := range files {
-		filenames = append(filenames, file.Name())
-	}
-	filename := BIRTHDAY_DIR_PATH + filenames[rand.Intn(len(filenames))]
 
 	// Read and play audio file
 	var audioBuffer [][]byte
