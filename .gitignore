@@ -15,7 +15,7 @@
 *.out
 
 # Dependency directories (remove the comment below to include it)
-# vendor/
+vendor/
 
 # Go workspace file
 go.work
@@ -25,4 +25,4 @@ assets/
 bin/
 
 .env
-userdata.sqlite3.db
+*.db

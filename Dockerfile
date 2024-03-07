@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM golang/1.22-bookworm
 
 WORKDIR /app
 
