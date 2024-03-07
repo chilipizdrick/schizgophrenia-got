@@ -21,6 +21,8 @@
 go.work
 
 
-.env
 assets/
-# userdata.sqlite3.db
+bin/
+
+.env
+userdata.sqlite3.db

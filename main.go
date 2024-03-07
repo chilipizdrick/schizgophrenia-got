@@ -17,18 +17,17 @@ import (
 )
 
 func init() {
-
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatalln("[FATAL] Could not load .env file.")
+		log.Println("[INFO] No .env file found.")
 	}
 
 	if os.Getenv("CLIENT_TOKEN") == "" {
-		log.Fatalln("[FATAL] Could not read CLIENT_TOKEN from the .env file.")
+		log.Fatalln("[FATAL] CLIENT_TOKEN env. variable not specified.")
 	}
 
 	if os.Getenv("CLIENT_ID") == "" {
-		log.Fatalln("[FATAL] Could not read CLIENT_ID from the .env file.")
+		log.Fatalln("[FATAL] CLIENT_ID env. variable not specified.")
 	}
 }
 
