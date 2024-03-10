@@ -1,4 +1,4 @@
-name: ci
+name: build-and-deploy-to-docker-hub
 
 on:
   push:
@@ -6,26 +6,8 @@ on:
   pull_request:
     branches: [ "master" ]
 
-
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
-    environment: ci
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.22'
-
-    - name: Build
-      run: go build -v ./...
-
-    - name: Test
-      run: TESTING_CLIENT_TOKEN=${{ secrets.TESTING_CLIENT_TOKEN }} TESTING_CLIENT_ID=${{ secrets.TESTING_CLIENT_ID }} TESTING_GUILD_ID=${{ secrets.TESTING_GUILD_ID }} go test -v ./...
-
-  build-and-deploy-to-dockerhub:
+  build-and-deploy-to-docker-hub:
     runs-on: ubuntu-latest
     environment: ci
     steps:
