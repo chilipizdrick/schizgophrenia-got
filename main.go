@@ -20,7 +20,8 @@ type SessionWrapper struct {
 	*discord.Session
 }
 
-func init() {
+func main() {
+	// Load and check for env. variables
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Println("[INFO] No .env file found.")
@@ -33,9 +34,7 @@ func init() {
 	if os.Getenv("CLIENT_ID") == "" {
 		log.Fatalln("[FATAL] CLIENT_ID env. variable not specified.")
 	}
-}
 
-func main() {
 	// Initialise new discord bot session
 	s := SessionWrapper{initNewDiscordSession(os.Getenv("CLIENT_TOKEN"))}
 

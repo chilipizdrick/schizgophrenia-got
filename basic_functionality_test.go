@@ -11,7 +11,7 @@ import (
 
 func TestBasicFunctionality(t *testing.T) {
 
-	// Load env. variables
+	// Load and check for env. variables
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Println("[INFO] No .env file found.")
