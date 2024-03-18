@@ -52,7 +52,7 @@ func greetingHandler(s *discord.Session, e *discord.VoiceStateUpdate) error {
 	// Check for supplied database filepath or use the default one
 	sqliteDatabaseFilepath := os.Getenv("SQLITE_DATABASE_FILEPATH")
 	if sqliteDatabaseFilepath == "" {
-		sqliteDatabaseFilepath = "./userdata.sqlite3.db"
+		sqliteDatabaseFilepath = "./userdata/userdata.sqlite3.db"
 	}
 
 	// Open db connection and create the greeting table if if does not exist
@@ -134,7 +134,7 @@ func greet(s *discord.Session, e *discord.VoiceStateUpdate) error {
 		return nil
 	}
 
-	const GREETING_FILEPATH = "./assets/audio/greeting.opus"
+	const GREETING_FILEPATH = "./assets/audio/greeting.ogg"
 
 	var audioBuffer [][]byte
 	err := utl.LoadOpusFile(GREETING_FILEPATH, &audioBuffer)
@@ -165,7 +165,7 @@ func birthdayHandler(s *discord.Session, e *discord.VoiceStateUpdate) error {
 	// Check for supplied database filepath or use the default one
 	sqliteDatabaseFilepath := os.Getenv("SQLITE_DATABASE_FILEPATH")
 	if sqliteDatabaseFilepath == "" {
-		sqliteDatabaseFilepath = "./userdata.sqlite3.db"
+		sqliteDatabaseFilepath = "./userdata/userdata.sqlite3.db"
 	}
 
 	// Open db connection and create the birthday table if if does not exist

@@ -60,7 +60,7 @@ var RegisterBirthdayCommand = utl.SlashCommand{
 		// Check for supplied database filepath or use the default one
 		sqliteDatabaseFilepath := os.Getenv("SQLITE_DATABASE_FILEPATH")
 		if sqliteDatabaseFilepath == "" {
-			sqliteDatabaseFilepath = "./userdata.sqlite3.db"
+			sqliteDatabaseFilepath = "./userdata/userdata.sqlite3.db"
 		}
 
 		// Open db connection and create the birthday table if if does not exist
