@@ -19,10 +19,6 @@ var (
 		"fontan":   utl.GenericVoiceCommand("fontan", "Plays \"Chocoladniy Fontan\"", "./assets/audio/voice/fontan.ogg"),
 		"women":    utl.GenericVoiceCommand("women", "Plays women", "./assets/audio/voice/women.ogg"),
 		"oblivion": utl.GenericVoiceCommand("oblivion", "Plays Oblivion NPC theme", "./assets/audio/voice/oblivion.ogg"),
-		"cave": utl.GenericVoiceCommand("cave", "Plays random minecraft cave sound",
-			func() string {
-				path, _ := utl.PickRandomFileFromDirectory("./assets/audio/voice/cave/")
-				return path
-			}()),
+		"cave":     utl.GenericRandomVoiceCommand("cave", "Plays random minecraft cave sound", "./assets/audio/voice/cave/"),
 	}
 )
