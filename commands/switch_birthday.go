@@ -18,14 +18,14 @@ var SwitchBirthdayCommand = utl.SlashCommand{
 			log.Printf("[ERROR] Could not load guild from database: %e", err)
 		}
 
-		if guildData.Birthbay {
-			guildData.Birthbay = false
+		if guildData.Birthday {
+			guildData.Birthday = false
 			utl.SaveGuildToDB(guildData)
 			utl.RespondToInteractionCreateWithString(s, i, "Birthday functionality is now disabled.")
 			return
 		}
 
-		guildData.Birthbay = true
+		guildData.Birthday = true
 		utl.SaveGuildToDB(guildData)
 		utl.RespondToInteractionCreateWithString(s, i, "Birthday functionality is now enabled.")
 	},

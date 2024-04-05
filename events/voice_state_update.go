@@ -29,7 +29,7 @@ func VoiceStateUpdateHandler(s *discord.Session, e *discord.VoiceStateUpdate) {
 		}
 	}
 
-	if guildData.Birthbay {
+	if guildData.Birthday {
 		err = birthdayHandler(s, e)
 		if err != nil {
 			log.Printf("[ERROR] Could not congratulate a user with his birthday: %v", err)

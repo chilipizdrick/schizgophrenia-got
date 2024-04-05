@@ -36,7 +36,7 @@ type Guild struct {
 	ID             uint
 	DiscordGuildID string
 	Greeting       bool
-	Birthbay       bool
+	Birthday       bool
 	DMOnMention    bool
 }
 
@@ -123,7 +123,7 @@ func LoadGuildFromDBByID(guildID string) (*Guild, error) {
 		guildData = Guild{
 			DiscordGuildID: guildID,
 			Greeting:       false,
-			Birthbay:       false,
+			Birthday:       false,
 		}
 
 		res = db.Create(&guildData)
