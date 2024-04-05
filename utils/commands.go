@@ -3,6 +3,7 @@ package utils
 import (
 	"errors"
 	"log"
+	"os"
 
 	discord "github.com/bwmarrin/discordgo"
 )
@@ -58,13 +59,61 @@ func GenericVoiceCommandHandler(filepath string) func(s *discord.Session, i *dis
 		})
 		defer s.InteractionResponseDelete(i.Interaction)
 
+		if vs, _ := s.State.VoiceState(i.GuildID, os.Getenv("CLIENT_ID")); vs.ChannelID != "" {
+			return
+		}
+
 		voiceChannelID, err := GetInteractionVoiceChannelID(s, i)
 		if err != nil {
 			log.Printf("[ERROR] %v", err)
+			EditResponseWithString(s, i, "User should be in voice channel.")
+			return
 		}
 
 		audioBuffer := make([][]byte, 0)
 
+		err = LoadOpusFile(filepath, &audioBuffer)
+		if err != nil {
+			log.Printf("[ERROR] %v", err)
+			EditResponseWithString(s, i, "Could not load audio file!")
+			return
+		}
+
+		err = PlayAudio(s, i.GuildID, voiceChannelID, audioBuffer)
+		if err != nil {
+			log.Printf("[ERROR] %v", err)
+			// editResponseWithString(s, i, "Could not connect to voice channel or disconnect from it!")
+			return
+		}
+	}
+}
+
+func GenericRandomVoiceCommandHandler(dirpath string) func(s *discord.Session, i *discord.InteractionCreate) {
+	return func(s *discord.Session, i *discord.InteractionCreate) {
+		s.InteractionRespond(i.Interaction, &discord.InteractionResponse{
+			Type: discord.InteractionResponseDeferredChannelMessageWithSource,
+		})
+		defer s.InteractionResponseDelete(i.Interaction)
+
+		if vs, _ := s.State.VoiceState(i.GuildID, os.Getenv("CLIENT_ID")); vs.ChannelID != "" {
+			return
+		}
+
+		voiceChannelID, err := GetInteractionVoiceChannelID(s, i)
+		if err != nil {
+			log.Printf("[ERROR] %v", err)
+			EditResponseWithString(s, i, "User should be in voice channel.")
+			return
+		}
+
+		audioBuffer := make([][]byte, 0)
+
+		filepath, err := PickRandomFileFromDirectory(dirpath)
+		if err != nil {
+			log.Printf("[ERROR] %v", err)
+			EditResponseWithString(s, i, "Could not randomly pick audio file path!")
+			return
+		}
 		err = LoadOpusFile(filepath, &audioBuffer)
 		if err != nil {
 			log.Printf("[ERROR] %v", err)
@@ -88,5 +137,15 @@ func GenericVoiceCommand(name, description, filepath string) SlashCommand {
 			Description: description,
 		},
 		CommandHandler: GenericVoiceCommandHandler(filepath),
+	}
+}
+
+func GenericRandomVoiceCommand(name, descriprion, dirpath string) SlashCommand {
+	return SlashCommand{
+		CommandData: &discord.ApplicationCommand{
+			Name:        name,
+			Description: descriprion,
+		},
+		CommandHandler: GenericRandomVoiceCommandHandler(dirpath),
 	}
 }

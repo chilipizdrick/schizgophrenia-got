@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
 	"os"
 	"strings"
@@ -24,6 +25,7 @@ func PickRandomFileFromDirectory(dirpath string) (string, error) {
 	}
 
 	filepath := dirpath + filenames[rand.Intn(len(filenames))]
+	log.Printf("[TRACE] call: PickRandomFileFromDirectory -> filepath: %v", filepath)
 
 	return filepath, nil
 }

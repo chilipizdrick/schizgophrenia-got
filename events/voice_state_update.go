@@ -1,7 +1,6 @@
 package events
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -10,9 +9,6 @@ import (
 
 	discord "github.com/bwmarrin/discordgo"
 	utl "github.com/chilipizdrick/schizgophrenia-got/utils"
-
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
 )
 
 func VoiceStateUpdateHandler(s *discord.Session, e *discord.VoiceStateUpdate) {
@@ -21,14 +17,23 @@ func VoiceStateUpdateHandler(s *discord.Session, e *discord.VoiceStateUpdate) {
 		return
 	}
 
-	err := greetingHandler(s, e)
+	guildData, err := utl.LoadGuildFromDBByID(e.GuildID)
 	if err != nil {
-		log.Printf("[ERROR] Could not greet a user: %v", err)
+		log.Printf("[ERROR] Could not load guild from database: %e", err)
 	}
 
-	err = birthdayHandler(s, e)
-	if err != nil {
-		log.Printf("[ERROR] Could not congratulate a user with his birthday: %v", err)
+	if guildData.Greeting {
+		err = greetingHandler(s, e)
+		if err != nil {
+			log.Printf("[ERROR] Could not greet a user: %v", err)
+		}
+	}
+
+	if guildData.Birthbay {
+		err = birthdayHandler(s, e)
+		if err != nil {
+			log.Printf("[ERROR] Could not congratulate a user with his birthday: %v", err)
+		}
 	}
 }
 
@@ -38,7 +43,6 @@ func greetingHandler(s *discord.Session, e *discord.VoiceStateUpdate) error {
 		return nil
 	}
 
-	// Check if user is in a voice channel now
 	// Return if user is not connected to a voice channel
 	if e.ChannelID == "" {
 		return nil
@@ -49,43 +53,18 @@ func greetingHandler(s *discord.Session, e *discord.VoiceStateUpdate) error {
 		return nil
 	}
 
-	// Check for supplied database filepath or use the default one
 	sqliteDatabaseFilepath := os.Getenv("SQLITE_DATABASE_FILEPATH")
 	if sqliteDatabaseFilepath == "" {
 		sqliteDatabaseFilepath = "./userdata/userdata.sqlite3.db"
 	}
 
-	// Open db connection and create the greeting table if if does not exist
-	db, err := gorm.Open(sqlite.Open(sqliteDatabaseFilepath), &gorm.Config{})
+	userData, err := utl.LoadUserFromDBByID(e.UserID)
 	if err != nil {
-		return fmt.Errorf("error opening database connection: %v", err)
-	}
-	db.AutoMigrate(&utl.GreetedUser{})
-
-	// Fetch user by his userId
-	var user utl.GreetedUser
-	res := db.First(&user, "discord_user_id = ?", e.UserID)
-	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
-		// Insert a user
-		user = utl.GreetedUser{
-			DiscordUserId:         e.UserID,
-			GreetingUnixTimestamp: time.Now().Unix(),
-		}
-		res = db.Create(&user)
-		if res.Error != nil {
-			return fmt.Errorf("error inserting a new user into database: %v", res.Error)
-		}
-
-		// Greet a user
-		err = greet(s, e)
-		if err != nil {
-			return fmt.Errorf("error while greeting: %v", err)
-		}
+		return fmt.Errorf("error loading user from database: %v", err)
 	}
 
-	lastGreetingUnixTime := user.GreetingUnixTimestamp
+	lastGreetingUnixTime := userData.GreetingUnixTimestamp
 
-	// Get greeting time petiod env. variable or use default (one week)
 	var greetingTimePeriod int64 = 604800 // One week in unix seconds
 	if os.Getenv("GREETING_TIME_PERIOD") != "" {
 		greetingTimePeriod, err = strconv.ParseInt(os.Getenv("GREETING_TIME_PERIOD"), 10, 64)
@@ -95,35 +74,17 @@ func greetingHandler(s *discord.Session, e *discord.VoiceStateUpdate) error {
 		}
 	}
 
-	// Check if the time has come to greet user again
 	if time.Now().Unix()-lastGreetingUnixTime > greetingTimePeriod {
-		// Update user's greeting time
-		err = updateUserGreetingTime(db, e.UserID, time.Now().Unix())
+		userData.GreetingUnixTimestamp = time.Now().Unix()
+		err = utl.SaveUserToDB(userData)
 		if err != nil {
 			return fmt.Errorf("error updating user's greeting time: %v", err)
 		}
 
-		// Greet the user
 		err = greet(s, e)
 		if err != nil {
 			return fmt.Errorf("error reading rows: %v", err)
 		}
-	}
-
-	return nil
-}
-
-func updateUserGreetingTime(db *gorm.DB, discordUserId string, unixTimestamp int64) error {
-	var user utl.GreetedUser
-	res := db.First(&user, "discord_user_id = ?", discordUserId)
-	if res.Error != nil {
-		return fmt.Errorf("error updating user in database: %v", res.Error)
-	}
-
-	user.GreetingUnixTimestamp = unixTimestamp
-	res = db.Save(&user)
-	if res.Error != nil {
-		return fmt.Errorf("error updating user in database: %v", res.Error)
 	}
 
 	return nil
@@ -151,7 +112,6 @@ func greet(s *discord.Session, e *discord.VoiceStateUpdate) error {
 }
 
 func birthdayHandler(s *discord.Session, e *discord.VoiceStateUpdate) error {
-	// Check if user is in a voice channel now
 	// Return if user is not connected to a voice channel
 	if e.ChannelID == "" {
 		return nil
@@ -162,35 +122,23 @@ func birthdayHandler(s *discord.Session, e *discord.VoiceStateUpdate) error {
 		return nil
 	}
 
-	// Check for supplied database filepath or use the default one
 	sqliteDatabaseFilepath := os.Getenv("SQLITE_DATABASE_FILEPATH")
 	if sqliteDatabaseFilepath == "" {
 		sqliteDatabaseFilepath = "./userdata/userdata.sqlite3.db"
 	}
 
-	// Open db connection and create the birthday table if if does not exist
-	db, err := gorm.Open(sqlite.Open(sqliteDatabaseFilepath), &gorm.Config{})
+	userData, err := utl.LoadUserFromDBByID(e.UserID)
 	if err != nil {
-		return fmt.Errorf("error opening database connection: %v", err)
-	}
-	db.AutoMigrate(&utl.BirthdayUser{})
-
-	// Fetch user by his userId
-	var user utl.BirthdayUser
-	res := db.First(&user, "discord_user_id = ?", e.UserID)
-	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
-		// If user has not been found, return
-		log.Println("[INFO] No birthday user has been found in the datbase.")
-		return nil
+		return fmt.Errorf("error loading user from databse: %v", err)
 	}
 
-	// Congratulate user if it is his birthday
-	if user.BirthdayDate == time.Now().Format("01/02") && user.LastGreetingYear < time.Now().Year() {
-		// Set user's last greeted year to this year
-		user.LastGreetingYear = time.Now().Year()
-		res = db.Save(&user)
-		if res.Error != nil {
-			return fmt.Errorf("error updating last greeting year in database: %v", res.Error)
+	if userData.BirthdayDate == time.Now().Format("01/02") &&
+		userData.LastBirthdayGreetingYear < time.Now().Year() {
+
+		userData.LastBirthdayGreetingYear = time.Now().Year()
+		err = utl.SaveUserToDB(userData)
+		if err != nil {
+			return fmt.Errorf("error updating last birthday greeting year in database: %v", err)
 		}
 
 		err = congratulate(s, e)
@@ -209,13 +157,11 @@ func congratulate(s *discord.Session, e *discord.VoiceStateUpdate) error {
 
 	const BIRTHDAY_DIR_PATH = "./assets/audio/birthday/"
 
-	// Pick random file from directory
 	filename, err := utl.PickRandomFileFromDirectory(BIRTHDAY_DIR_PATH)
 	if err != nil {
 		return fmt.Errorf("error picking random file from directory: %v", err)
 	}
 
-	// Read and play audio file
 	var audioBuffer [][]byte
 	err = utl.LoadOpusFile(filename, &audioBuffer)
 	if err != nil {

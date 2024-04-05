@@ -36,7 +36,7 @@ func LoadOpusFile(filepath string, buffer *[][]byte) error {
 	}
 }
 
-func PlayAudio(s *discord.Session, guildID string, channelID string, buffer [][]byte) (err error) {
+func PlayAudio(s *discord.Session, guildID string, channelID string, buffer [][]byte) error {
 
 	vc, err := s.ChannelVoiceJoin(guildID, channelID, false, true)
 	if err != nil {

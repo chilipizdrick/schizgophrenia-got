@@ -24,5 +24,7 @@ go.work
 assets/
 bin/
 
-.env
+*.env
+*.toml
+
 *.db
