@@ -3,7 +3,6 @@ package utils
 import (
 	"errors"
 	"log"
-	"os"
 
 	discord "github.com/bwmarrin/discordgo"
 )
@@ -59,7 +58,8 @@ func GenericVoiceCommandHandler(filepath string) func(s *discord.Session, i *dis
 		})
 		defer s.InteractionResponseDelete(i.Interaction)
 
-		if vs, _ := s.State.VoiceState(i.GuildID, os.Getenv("CLIENT_ID")); vs.ChannelID != "" {
+		// Return if user is bot
+		if i.Member.User.Bot {
 			return
 		}
 
@@ -95,7 +95,8 @@ func GenericRandomVoiceCommandHandler(dirpath string) func(s *discord.Session, i
 		})
 		defer s.InteractionResponseDelete(i.Interaction)
 
-		if vs, _ := s.State.VoiceState(i.GuildID, os.Getenv("CLIENT_ID")); vs.ChannelID != "" {
+		// Return if user is bot
+		if i.Member.User.Bot {
 			return
 		}
 
