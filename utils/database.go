@@ -13,24 +13,12 @@ import (
 type User struct {
 	ID                       uint
 	DiscordUserID            string
+	DiscordGuildID           string
 	GreetingEnabled          bool
 	GreetingUnixTimestamp    int64
 	BirthdayDate             string // In MM/DD format
 	LastBirthdayGreetingYear int
 }
-
-// type BirthdayUser struct {
-// 	ID               uint
-// 	DiscordUserId    string
-// 	BirthdayDate     string // In MM/DD format
-// 	LastGreetingYear int
-// }
-
-// type GreetedUser struct {
-// 	ID                    uint
-// 	DiscordUserId         string
-// 	GreetingUnixTimestamp int64
-// }
 
 type Guild struct {
 	ID             uint

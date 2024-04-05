@@ -53,6 +53,11 @@ func greetingHandler(s *discord.Session, e *discord.VoiceStateUpdate) error {
 		return nil
 	}
 
+	// Return if user is a bot
+	if e.Member.User.Bot {
+		return nil
+	}
+
 	sqliteDatabaseFilepath := os.Getenv("SQLITE_DATABASE_FILEPATH")
 	if sqliteDatabaseFilepath == "" {
 		sqliteDatabaseFilepath = "./userdata/userdata.sqlite3.db"

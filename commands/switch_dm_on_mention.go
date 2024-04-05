@@ -10,7 +10,7 @@ import (
 var SwitchDMOnMentionCommand = utl.SlashCommand{
 	CommandData: &discord.ApplicationCommand{
 		Name:        "switch-dm-on-mention",
-		Description: "Switch DM on mention functionality on this server.",
+		Description: "[NOT CURRNETLY WORKING] Switch DM on mention functionality on this server.",
 	},
 	CommandHandler: func(s *discord.Session, i *discord.InteractionCreate) {
 		guildData, err := utl.LoadGuildFromDBByID(i.GuildID)
