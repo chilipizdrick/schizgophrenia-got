@@ -3,6 +3,7 @@ package utils
 import (
 	"errors"
 	"log"
+	"os"
 
 	discord "github.com/bwmarrin/discordgo"
 )
@@ -58,8 +59,15 @@ func GenericVoiceCommandHandler(filepath string) func(s *discord.Session, i *dis
 		})
 		defer s.InteractionResponseDelete(i.Interaction)
 
-		// Return if user is bot
-		if i.Member.User.Bot {
+		// Return if client already connected to vc on this server
+		vs, err := s.State.VoiceState(i.GuildID, os.Getenv("CLIENT_ID"))
+		if err != nil {
+			log.Printf("[ERROR] %v", err)
+			EditResponseWithString(s, i, "An error occured while executing command.")
+			return
+		}
+		if vs.ChannelID != "" {
+			log.Println("[TRACE] exited because already in vc")
 			return
 		}
 
@@ -95,8 +103,15 @@ func GenericRandomVoiceCommandHandler(dirpath string) func(s *discord.Session, i
 		})
 		defer s.InteractionResponseDelete(i.Interaction)
 
-		// Return if user is bot
-		if i.Member.User.Bot {
+		// Return if client already connected to vc on this server
+		vs, err := s.State.VoiceState(i.GuildID, os.Getenv("CLIENT_ID"))
+		if err != nil {
+			log.Printf("[ERROR] %v", err)
+			EditResponseWithString(s, i, "An error occured while executing command.")
+			return
+		}
+		if vs.ChannelID != "" {
+			log.Println("[TRACE] exited because already in vc")
 			return
 		}
 
