@@ -57,17 +57,24 @@ func GenericVoiceCommandHandler(filepath string) func(s *discord.Session, i *dis
 		s.InteractionRespond(i.Interaction, &discord.InteractionResponse{
 			Type: discord.InteractionResponseDeferredChannelMessageWithSource,
 		})
-		defer s.InteractionResponseDelete(i.Interaction)
+		// defer s.InteractionResponseDelete(i.Interaction)
 
 		// Return if client already connected to vc on this server
 		vs, err := s.State.VoiceState(i.GuildID, os.Getenv("CLIENT_ID"))
-		if err != nil {
+		if err != nil && err != discord.ErrStateNotFound {
 			log.Printf("[ERROR] %v", err)
 			EditResponseWithString(s, i, "An error occured while executing command.")
 			return
 		}
-		if vs.ChannelID != "" {
-			log.Println("[TRACE] exited because already in vc")
+		var guildID string
+		if err != discord.ErrStateNotFound {
+			guildID = vs.GuildID
+		} else {
+			guildID = ""
+		}
+		if guildID != "" {
+			// log.Println("[TRACE] exited because already in vc")
+			s.InteractionResponseDelete(i.Interaction)
 			return
 		}
 
@@ -87,10 +94,12 @@ func GenericVoiceCommandHandler(filepath string) func(s *discord.Session, i *dis
 			return
 		}
 
+		s.InteractionResponseDelete(i.Interaction)
+
 		err = PlayAudio(s, i.GuildID, voiceChannelID, audioBuffer)
 		if err != nil {
 			log.Printf("[ERROR] %v", err)
-			// editResponseWithString(s, i, "Could not connect to voice channel or disconnect from it!")
+			// EditResponseWithString(s, i, "Could not connect to voice channel or disconnect from it!")
 			return
 		}
 	}
@@ -101,17 +110,24 @@ func GenericRandomVoiceCommandHandler(dirpath string) func(s *discord.Session, i
 		s.InteractionRespond(i.Interaction, &discord.InteractionResponse{
 			Type: discord.InteractionResponseDeferredChannelMessageWithSource,
 		})
-		defer s.InteractionResponseDelete(i.Interaction)
+		// defer s.InteractionResponseDelete(i.Interaction)
 
 		// Return if client already connected to vc on this server
 		vs, err := s.State.VoiceState(i.GuildID, os.Getenv("CLIENT_ID"))
-		if err != nil {
+		if err != nil && err != discord.ErrStateNotFound {
 			log.Printf("[ERROR] %v", err)
 			EditResponseWithString(s, i, "An error occured while executing command.")
 			return
 		}
-		if vs.ChannelID != "" {
-			log.Println("[TRACE] exited because already in vc")
+		var guildID string
+		if err != discord.ErrStateNotFound {
+			guildID = vs.GuildID
+		} else {
+			guildID = ""
+		}
+		if guildID != "" {
+			// log.Println("[TRACE] exited because already in vc")
+			s.InteractionResponseDelete(i.Interaction)
 			return
 		}
 
@@ -127,20 +143,22 @@ func GenericRandomVoiceCommandHandler(dirpath string) func(s *discord.Session, i
 		filepath, err := PickRandomFileFromDirectory(dirpath)
 		if err != nil {
 			log.Printf("[ERROR] %v", err)
-			EditResponseWithString(s, i, "Could not randomly pick audio file path!")
+			EditResponseWithString(s, i, "Could not randomly pick audio file.")
 			return
 		}
 		err = LoadOpusFile(filepath, &audioBuffer)
 		if err != nil {
 			log.Printf("[ERROR] %v", err)
-			EditResponseWithString(s, i, "Could not load audio file!")
+			EditResponseWithString(s, i, "Could not load audio file.")
 			return
 		}
+
+		s.InteractionResponseDelete(i.Interaction)
 
 		err = PlayAudio(s, i.GuildID, voiceChannelID, audioBuffer)
 		if err != nil {
 			log.Printf("[ERROR] %v", err)
-			// editResponseWithString(s, i, "Could not connect to voice channel or disconnect from it!")
+			// EditResponseWithString(s, i, "Could not connect to voice channel or disconnect from it!")
 			return
 		}
 	}
