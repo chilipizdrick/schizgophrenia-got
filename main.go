@@ -21,7 +21,7 @@ type SessionWrapper struct {
 }
 
 func main() {
-	// Load and check for env. variables
+	// Load and check for essential env. variables
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Println("[INFO] No .env file found.")
@@ -50,13 +50,9 @@ func main() {
 	s.addCommandHandlers()
 
 	s.openConnection()
+	defer s.closeConnection()
 
 	s.registerCommands(os.Getenv("GUILD_ID"))
-
-	// Close connection when process exits
-	defer func() {
-		s.closeConnection()
-	}()
 
 	// Wait here until CTRL-C or other term signal is received
 	fmt.Println("Press CTRL-C to exit.")

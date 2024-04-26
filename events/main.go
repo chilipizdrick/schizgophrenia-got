@@ -4,5 +4,5 @@ package events
 var EventHandlers = []any{
 	ReadyEventHandler,
 	VoiceStateUpdateHandler,
-	MessageCreateHandler,
+	// MessageCreateHandler,
 }

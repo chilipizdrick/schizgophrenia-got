@@ -10,7 +10,6 @@ import (
 )
 
 func TestBasicFunctionality(t *testing.T) {
-
 	// Load and check for env. variables
 	err := godotenv.Load(".env")
 	if err != nil {

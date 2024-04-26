@@ -11,10 +11,9 @@ import (
 )
 
 func LoadOpusFile(filepath string, buffer *[][]byte) error {
-
 	file, err := os.Open(filepath)
 	if err != nil {
-		return fmt.Errorf("error reading file: %v", err)
+		return fmt.Errorf("error opening file: %v", err)
 	}
 
 	defer file.Close()
@@ -37,11 +36,11 @@ func LoadOpusFile(filepath string, buffer *[][]byte) error {
 }
 
 func PlayAudio(s *discord.Session, guildID string, channelID string, buffer [][]byte) error {
-
 	vc, err := s.ChannelVoiceJoin(guildID, channelID, false, true)
 	if err != nil {
 		return err
 	}
+
 	time.Sleep(250 * time.Millisecond)
 	vc.Speaking(true)
 
