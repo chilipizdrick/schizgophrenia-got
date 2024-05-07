@@ -53,7 +53,12 @@ var ColorCommand = utl.SlashCommand{
 				return
 			}
 
-			s.GuildMemberRoleAdd(i.GuildID, userID, personalRole.ID)
+			err = s.GuildMemberRoleAdd(i.GuildID, userID, personalRole.ID)
+			if err != nil {
+				utl.RespondToInteractionCreateWithString(s, i, "Could not give newly created personal role to user.")
+				log.Printf("[ERROR] Could not give newly created personal role to user. %v", err)
+				return
+			}
 		}
 
 		// If role has not been created (already existed) then fetch it
@@ -63,6 +68,23 @@ var ColorCommand = utl.SlashCommand{
 					personalRole = role
 					break
 				}
+			}
+		}
+
+		// Check if role exists, but user does not have it
+		// (may happen when user leaves and rejoins the server)
+		member, err := s.State.Member(i.GuildID, userID)
+		if err != nil {
+			utl.RespondToInteractionCreateWithString(s, i, "Could not fetch user by ID.")
+			log.Printf("[ERROR] Error fetching member by ID. %v", err)
+			return
+		}
+		if !funk.Contains(member.Roles, personalRole.ID) {
+			err = s.GuildMemberRoleAdd(i.GuildID, userID, personalRole.ID)
+			if err != nil {
+				utl.RespondToInteractionCreateWithString(s, i, "Could not give personal role to user.")
+				log.Printf("[ERROR] Could not give personal role to user. %v", err)
+				return
 			}
 		}
 
