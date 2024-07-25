@@ -13,14 +13,14 @@ import (
 func LoadOpusFile(filepath string, buffer *[][]byte) error {
 	file, err := os.Open(filepath)
 	if err != nil {
-		return fmt.Errorf("error opening file: %v", err)
+		return fmt.Errorf("error opening file: %s", err)
 	}
 
 	defer file.Close()
 
 	reader, _, err := oggreader.NewWith(file)
 	if err != nil {
-		return fmt.Errorf("error reading file: %v", err)
+		return fmt.Errorf("error reading file: %s", err)
 	}
 
 	for {
@@ -28,7 +28,7 @@ func LoadOpusFile(filepath string, buffer *[][]byte) error {
 		if err == io.EOF || err == io.ErrUnexpectedEOF {
 			return nil
 		} else if err != nil {
-			return fmt.Errorf("error reading file: %v", err)
+			return fmt.Errorf("error reading file: %s", err)
 		}
 
 		*buffer = append(*buffer, inBuf...)
@@ -52,7 +52,7 @@ func PlayAudio(s *discord.Session, guildID string, channelID string, buffer [][]
 	time.Sleep(250 * time.Millisecond)
 	err = vc.Disconnect()
 	if err != nil {
-		return fmt.Errorf("error on voiceChannnel.Disconect: %w", err)
+		return fmt.Errorf("error on voiceChannnel.Disconect: %s", err)
 	}
 
 	return nil

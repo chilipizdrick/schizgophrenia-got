@@ -29,7 +29,7 @@ var ColorCommand = utl.SlashCommand{
 		guildRoles, err := s.GuildRoles(i.GuildID)
 		if err != nil {
 			utl.RespondToInteractionCreateWithString(s, i, "Could not get server roles.")
-			log.Printf("[ERROR] Error fetching guild roles by guildID. %v", err)
+			log.Printf("[ERROR] Error fetching guild roles by guildID. %s", err)
 			return
 		}
 
@@ -48,7 +48,7 @@ var ColorCommand = utl.SlashCommand{
 				Mentionable: &mentionable,
 			})
 			if err != nil {
-				log.Printf("[ERROR] Error creating new personal user's role. %v", err)
+				log.Printf("[ERROR] Error creating new personal user's role. %s", err)
 				utl.RespondToInteractionCreateWithString(s, i, "Could not create user's personal role.")
 				return
 			}
@@ -56,7 +56,7 @@ var ColorCommand = utl.SlashCommand{
 			err = s.GuildMemberRoleAdd(i.GuildID, userID, personalRole.ID)
 			if err != nil {
 				utl.RespondToInteractionCreateWithString(s, i, "Could not give newly created personal role to user.")
-				log.Printf("[ERROR] Could not give newly created personal role to user. %v", err)
+				log.Printf("[ERROR] Could not give newly created personal role to user. %s", err)
 				return
 			}
 		}
@@ -76,14 +76,14 @@ var ColorCommand = utl.SlashCommand{
 		member, err := s.State.Member(i.GuildID, userID)
 		if err != nil {
 			utl.RespondToInteractionCreateWithString(s, i, "Could not fetch user by ID.")
-			log.Printf("[ERROR] Error fetching member by ID. %v", err)
+			log.Printf("[ERROR] Error fetching member by ID. %s", err)
 			return
 		}
 		if !funk.Contains(member.Roles, personalRole.ID) {
 			err = s.GuildMemberRoleAdd(i.GuildID, userID, personalRole.ID)
 			if err != nil {
 				utl.RespondToInteractionCreateWithString(s, i, "Could not give personal role to user.")
-				log.Printf("[ERROR] Could not give personal role to user. %v", err)
+				log.Printf("[ERROR] Could not give personal role to user. %s", err)
 				return
 			}
 		}
@@ -94,7 +94,7 @@ var ColorCommand = utl.SlashCommand{
 		uIntColor, err := strconv.ParseUint(cleanedHexColor, 16, 64)
 		if err != nil {
 			utl.RespondToInteractionCreateWithString(s, i, "Invalid color in HEX format has been provided.")
-			log.Printf("[ERROR] Error parsing hexidecimal color. %v", err)
+			log.Printf("[ERROR] Error parsing hexidecimal color. %s", err)
 			return
 		}
 
@@ -104,6 +104,6 @@ var ColorCommand = utl.SlashCommand{
 			Color: &intColor,
 		})
 
-		utl.RespondToInteractionCreateWithString(s, i, fmt.Sprintf("Successfully updated %v's personal role color.", i.Member.Mention()))
+		utl.RespondToInteractionCreateWithString(s, i, fmt.Sprintf("Successfully updated %s's personal role color.", i.Member.Mention()))
 	},
 }

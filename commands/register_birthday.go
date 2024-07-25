@@ -62,7 +62,7 @@ var RegisterBirthdayCommand = utl.SlashCommand{
 		userData, err := utl.LoadUserFromDBByID(userID)
 		if err != nil {
 			utl.RespondToInteractionCreateWithString(s, i, "An error occured while executing command.")
-			log.Printf("[ERROR] Could not load user from database: %v", err)
+			log.Printf("[ERROR] Could not load user from database: %s", err)
 			return
 		}
 
@@ -70,10 +70,10 @@ var RegisterBirthdayCommand = utl.SlashCommand{
 		err = utl.SaveUserToDB(userData)
 		if err != nil {
 			utl.RespondToInteractionCreateWithString(s, i, "An error occured while executing command.")
-			log.Printf("[ERROR] Could not update user's birthday date: %v", err)
+			log.Printf("[ERROR] Could not update user's birthday date: %s", err)
 			return
 		}
 
-		utl.RespondToInteractionCreateWithString(s, i, fmt.Sprintf("Successfully updated <@%v>'s birthday to be %s.", userID, birthdayDate))
+		utl.RespondToInteractionCreateWithString(s, i, fmt.Sprintf("Successfully updated <@%s>'s birthday to be %s.", userID, birthdayDate))
 	},
 }

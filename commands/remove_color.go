@@ -20,7 +20,7 @@ var RemoveColorCommand = utl.SlashCommand{
 		guildRoles, err := s.GuildRoles(i.GuildID)
 		if err != nil {
 			utl.RespondToInteractionCreateWithString(s, i, "Could not get server roles.")
-			log.Printf("[ERROR] Error fetching guild roles by guildID. %v", err)
+			log.Printf("[ERROR] Error fetching guild roles by guildID. %s", err)
 			return
 		}
 
@@ -38,6 +38,6 @@ var RemoveColorCommand = utl.SlashCommand{
 
 		s.GuildRoleDelete(i.GuildID, personalRole.ID)
 
-		utl.RespondToInteractionCreateWithString(s, i, fmt.Sprintf("Successfully deleted %v's personal color role.", i.Member.Mention()))
+		utl.RespondToInteractionCreateWithString(s, i, fmt.Sprintf("Successfully deleted %s's personal color role.", i.Member.Mention()))
 	},
 }

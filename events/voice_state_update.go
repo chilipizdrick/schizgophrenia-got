@@ -19,20 +19,20 @@ func VoiceStateUpdateHandler(s *discord.Session, e *discord.VoiceStateUpdate) {
 
 	guildData, err := utl.LoadGuildFromDBByID(e.GuildID)
 	if err != nil {
-		log.Printf("[ERROR] Could not load guild from database: %e", err)
+		log.Printf("[ERROR] Could not load guild from database: %s", err)
 	}
 
 	if guildData.Greeting {
 		err = greetingHandler(s, e)
 		if err != nil {
-			log.Printf("[ERROR] Could not greet a user: %v", err)
+			log.Printf("[ERROR] Could not greet a user: %s", err)
 		}
 	}
 
 	if guildData.Birthday {
 		err = birthdayHandler(s, e)
 		if err != nil {
-			log.Printf("[ERROR] Could not congratulate a user with his birthday: %v", err)
+			log.Printf("[ERROR] Could not congratulate a user with his birthday: %s", err)
 		}
 	}
 }
@@ -65,7 +65,7 @@ func greetingHandler(s *discord.Session, e *discord.VoiceStateUpdate) error {
 
 	userData, err := utl.LoadUserFromDBByID(e.UserID)
 	if err != nil {
-		return fmt.Errorf("error loading user from database: %v", err)
+		return fmt.Errorf("error loading user from database: %s", err)
 	}
 
 	lastGreetingUnixTime := userData.GreetingUnixTimestamp
@@ -75,7 +75,7 @@ func greetingHandler(s *discord.Session, e *discord.VoiceStateUpdate) error {
 		greetingTimePeriod, err = strconv.ParseInt(os.Getenv("GREETING_TIME_PERIOD"), 10, 64)
 		if err != nil {
 			greetingTimePeriod = 604800 // One week in unix seconds
-			log.Printf("[ERROR] Error parsing GREETING_TIME_PERIOD env. variable; using default (one week): %v", err)
+			log.Printf("[ERROR] Error parsing GREETING_TIME_PERIOD env. variable; using default (one week): %s", err)
 		}
 	}
 
@@ -83,12 +83,12 @@ func greetingHandler(s *discord.Session, e *discord.VoiceStateUpdate) error {
 		userData.GreetingUnixTimestamp = time.Now().Unix()
 		err = utl.SaveUserToDB(userData)
 		if err != nil {
-			return fmt.Errorf("error updating user's greeting time: %v", err)
+			return fmt.Errorf("error updating user's greeting time: %s", err)
 		}
 
 		err = greet(s, e)
 		if err != nil {
-			return fmt.Errorf("error reading rows: %v", err)
+			return fmt.Errorf("error reading rows: %s", err)
 		}
 	}
 
@@ -105,12 +105,12 @@ func greet(s *discord.Session, e *discord.VoiceStateUpdate) error {
 	var audioBuffer [][]byte
 	err := utl.LoadOpusFile(GREETING_FILEPATH, &audioBuffer)
 	if err != nil {
-		return fmt.Errorf("error loading opus file: %v", err)
+		return fmt.Errorf("error loading opus file: %s", err)
 	}
 
 	err = utl.PlayAudio(s, e.GuildID, e.ChannelID, audioBuffer)
 	if err != nil {
-		return fmt.Errorf("error playing audio: %v", err)
+		return fmt.Errorf("error playing audio: %s", err)
 	}
 
 	return nil
@@ -134,7 +134,7 @@ func birthdayHandler(s *discord.Session, e *discord.VoiceStateUpdate) error {
 
 	userData, err := utl.LoadUserFromDBByID(e.UserID)
 	if err != nil {
-		return fmt.Errorf("error loading user from databse: %v", err)
+		return fmt.Errorf("error loading user from databse: %s", err)
 	}
 
 	if userData.BirthdayDate == time.Now().Format("01/02") &&
@@ -143,12 +143,12 @@ func birthdayHandler(s *discord.Session, e *discord.VoiceStateUpdate) error {
 		userData.LastBirthdayGreetingYear = time.Now().Year()
 		err = utl.SaveUserToDB(userData)
 		if err != nil {
-			return fmt.Errorf("error updating last birthday greeting year in database: %v", err)
+			return fmt.Errorf("error updating last birthday greeting year in database: %s", err)
 		}
 
 		err = congratulate(s, e)
 		if err != nil {
-			return fmt.Errorf("error while congratulating: %v", err)
+			return fmt.Errorf("error while congratulating: %s", err)
 		}
 	}
 
@@ -164,18 +164,18 @@ func congratulate(s *discord.Session, e *discord.VoiceStateUpdate) error {
 
 	filename, err := utl.PickRandomFileFromDirectory(BIRTHDAY_DIR_PATH)
 	if err != nil {
-		return fmt.Errorf("error picking random file from directory: %v", err)
+		return fmt.Errorf("error picking random file from directory: %s", err)
 	}
 
 	var audioBuffer [][]byte
 	err = utl.LoadOpusFile(filename, &audioBuffer)
 	if err != nil {
-		return fmt.Errorf("error loading opus file: %v", err)
+		return fmt.Errorf("error loading opus file: %s", err)
 	}
 
 	err = utl.PlayAudio(s, e.GuildID, e.ChannelID, audioBuffer)
 	if err != nil {
-		return fmt.Errorf("error playing audio: %v", err)
+		return fmt.Errorf("error playing audio: %s", err)
 	}
 
 	return nil

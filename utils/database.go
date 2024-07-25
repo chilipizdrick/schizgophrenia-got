@@ -48,7 +48,7 @@ func LoadUserFromDBByID(userID string) (*User, error) {
 	var userData User
 	res := db.First(&userData, "discord_user_id = ?", userID)
 	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
-		log.Printf("[INFO] Could not find user (discord_user_id=%v) in the database, creating new.", userID)
+		log.Printf("[INFO] Could not find user (discord_user_id=%s) in the database, creating new.", userID)
 		userData = User{
 			DiscordUserID:   userID,
 			GreetingEnabled: true,
@@ -107,7 +107,7 @@ func LoadGuildFromDBByID(guildID string) (*Guild, error) {
 	var guildData Guild
 	res := db.First(&guildData, "discord_guild_id = ?", guildID)
 	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
-		log.Printf("[INFO] Could not find guild (discord_guild_id=%v) in the database, creating new.", guildID)
+		log.Printf("[INFO] Could not find guild (discord_guild_id=%s) in the database, creating new.", guildID)
 		guildData = Guild{
 			DiscordGuildID: guildID,
 			Greeting:       false,

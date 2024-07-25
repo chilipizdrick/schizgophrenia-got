@@ -9,6 +9,6 @@ import (
 
 func ReadyEventHandler(s *discord.Session, e *discord.Ready) {
 	// log.Printf("[TRACE] %v", s.State)
-	logMessage := fmt.Sprintf("[INFO] Logged in as: %v#%v", s.State.User.Username, s.State.User.Discriminator)
+	logMessage := fmt.Sprintf("[INFO] Logged in as: %s#%s", s.State.User.Username, s.State.User.Discriminator)
 	log.Println(logMessage)
 }

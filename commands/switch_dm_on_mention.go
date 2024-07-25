@@ -15,7 +15,7 @@ var SwitchDMOnMentionCommand = utl.SlashCommand{
 	CommandHandler: func(s *discord.Session, i *discord.InteractionCreate) {
 		guildData, err := utl.LoadGuildFromDBByID(i.GuildID)
 		if err != nil {
-			log.Printf("[ERROR] Could not load guild from database: %e", err)
+			log.Printf("[ERROR] Could not load guild from database: %s", err)
 		}
 
 		if guildData.DMOnMention {

@@ -14,6 +14,7 @@ import (
 
 	"github.com/chilipizdrick/schizgophrenia-got/commands"
 	"github.com/chilipizdrick/schizgophrenia-got/events"
+	"github.com/chilipizdrick/schizgophrenia-got/status"
 )
 
 type SessionWrapper struct {
@@ -51,6 +52,8 @@ func main() {
 
 	s.openConnection()
 	defer s.closeConnection()
+
+	go status.MinecraftServerCheckRoutine(s.Session)
 
 	s.registerCommands(os.Getenv("GUILD_ID"))
 
@@ -103,13 +106,13 @@ func (s *SessionWrapper) registerCommands(guildID string) {
 		for _, v := range commands.SlashCommands {
 			cmd, err := s.ApplicationCommandCreate(s.State.User.ID, guildID, v.CommandData)
 			if err != nil {
-				log.Panicf("[ERROR] Cannot create '%v' command: %v", v.CommandData.Name, err)
+				log.Panicf("[ERROR] Cannot create '%s' command: %s", v.CommandData.Name, err)
 			}
 			registeredCommands = append(registeredCommands, cmd)
 		}
 		log.Println("[INFO] Registered commands:")
 		for _, v := range registeredCommands {
-			log.Printf("[INFO] /%v", v.Name)
+			log.Printf("[INFO] /%s", v.Name)
 		}
 	}
 }
@@ -131,14 +134,14 @@ func (s *SessionWrapper) removeRegisteredCommands(clientID string, guildID strin
 
 		registeredCommands, err := s.ApplicationCommands(clientID, guildID)
 		if err != nil {
-			log.Panicf("[ERROR] Could not fetch registered commands: %v", err)
+			log.Panicf("[ERROR] Could not fetch registered commands: %s", err)
 			return
 		}
 
 		for _, v := range registeredCommands {
 			err := s.ApplicationCommandDelete(s.State.User.ID, guildID, v.ID)
 			if err != nil {
-				log.Panicf("[ERROR] Could not delete '%v' command: %v", v.Name, err)
+				log.Panicf("[ERROR] Could not delete '%s' command: %s", v.Name, err)
 			}
 		}
 	}

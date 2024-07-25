@@ -40,7 +40,7 @@ func EditResponseWithString(s *discord.Session, i *discord.InteractionCreate, me
 func GetInteractionVoiceChannelID(s *discord.Session, i *discord.InteractionCreate) (string, error) {
 	voiceState, err := s.State.VoiceState(i.GuildID, i.Member.User.ID)
 	if err != nil {
-		log.Printf("[ERROR] %v", err)
+		log.Printf("[ERROR] %s", err)
 		return "", errors.New("could not get user's voice state")
 	}
 
@@ -62,7 +62,7 @@ func GenericVoiceCommandHandler(filepath string) func(s *discord.Session, i *dis
 		// Return if client already connected to vc on this server
 		vs, err := s.State.VoiceState(i.GuildID, os.Getenv("CLIENT_ID"))
 		if err != nil && err != discord.ErrStateNotFound {
-			log.Printf("[ERROR] %v", err)
+			log.Printf("[ERROR] %s", err)
 			EditResponseWithString(s, i, "An error occured while executing command.")
 			return
 		}
@@ -80,7 +80,7 @@ func GenericVoiceCommandHandler(filepath string) func(s *discord.Session, i *dis
 
 		voiceChannelID, err := GetInteractionVoiceChannelID(s, i)
 		if err != nil {
-			log.Printf("[ERROR] %v", err)
+			log.Printf("[ERROR] %s", err)
 			EditResponseWithString(s, i, "User should be in voice channel.")
 			return
 		}
@@ -89,7 +89,7 @@ func GenericVoiceCommandHandler(filepath string) func(s *discord.Session, i *dis
 
 		err = LoadOpusFile(filepath, &audioBuffer)
 		if err != nil {
-			log.Printf("[ERROR] %v", err)
+			log.Printf("[ERROR] %s", err)
 			EditResponseWithString(s, i, "Could not load audio file!")
 			return
 		}
@@ -98,7 +98,7 @@ func GenericVoiceCommandHandler(filepath string) func(s *discord.Session, i *dis
 
 		err = PlayAudio(s, i.GuildID, voiceChannelID, audioBuffer)
 		if err != nil {
-			log.Printf("[ERROR] %v", err)
+			log.Printf("[ERROR] %s", err)
 			// EditResponseWithString(s, i, "Could not connect to voice channel or disconnect from it!")
 			return
 		}
@@ -115,7 +115,7 @@ func GenericRandomVoiceCommandHandler(dirpath string) func(s *discord.Session, i
 		// Return if client already connected to vc on this server
 		vs, err := s.State.VoiceState(i.GuildID, os.Getenv("CLIENT_ID"))
 		if err != nil && err != discord.ErrStateNotFound {
-			log.Printf("[ERROR] %v", err)
+			log.Printf("[ERROR] %s", err)
 			EditResponseWithString(s, i, "An error occured while executing command.")
 			return
 		}
@@ -133,7 +133,7 @@ func GenericRandomVoiceCommandHandler(dirpath string) func(s *discord.Session, i
 
 		voiceChannelID, err := GetInteractionVoiceChannelID(s, i)
 		if err != nil {
-			log.Printf("[ERROR] %v", err)
+			log.Printf("[ERROR] %s", err)
 			EditResponseWithString(s, i, "User should be in voice channel.")
 			return
 		}
@@ -142,13 +142,13 @@ func GenericRandomVoiceCommandHandler(dirpath string) func(s *discord.Session, i
 
 		filepath, err := PickRandomFileFromDirectory(dirpath)
 		if err != nil {
-			log.Printf("[ERROR] %v", err)
+			log.Printf("[ERROR] %s", err)
 			EditResponseWithString(s, i, "Could not randomly pick audio file.")
 			return
 		}
 		err = LoadOpusFile(filepath, &audioBuffer)
 		if err != nil {
-			log.Printf("[ERROR] %v", err)
+			log.Printf("[ERROR] %s", err)
 			EditResponseWithString(s, i, "Could not load audio file.")
 			return
 		}
@@ -157,7 +157,7 @@ func GenericRandomVoiceCommandHandler(dirpath string) func(s *discord.Session, i
 
 		err = PlayAudio(s, i.GuildID, voiceChannelID, audioBuffer)
 		if err != nil {
-			log.Printf("[ERROR] %v", err)
+			log.Printf("[ERROR] %s", err)
 			// EditResponseWithString(s, i, "Could not connect to voice channel or disconnect from it!")
 			return
 		}

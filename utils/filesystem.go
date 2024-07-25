@@ -15,7 +15,7 @@ func PickRandomFileFromDirectory(dirpath string) (string, error) {
 
 	files, err := os.ReadDir(dirpath)
 	if err != nil {
-		return "", fmt.Errorf("error reading %v directory contents: %s", dirpath, err)
+		return "", fmt.Errorf("error reading %s directory contents: %s", dirpath, err)
 	}
 
 	var filenames []string
@@ -24,7 +24,7 @@ func PickRandomFileFromDirectory(dirpath string) (string, error) {
 	}
 
 	filepath := dirpath + filenames[rand.Intn(len(filenames))]
-	// log.Printf("[TRACE] call: PickRandomFileFromDirectory -> filepath: %v", filepath)
+	// log.Printf("[TRACE] call: PickRandomFileFromDirectory -> filepath: %s", filepath)
 
 	return filepath, nil
 }
