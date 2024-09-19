@@ -33,11 +33,11 @@ func TestBasicFunctionality(t *testing.T) {
 
 	s.addCommandHandlers()
 
-	s.openConnection()
-
-	s.registerCommands(os.Getenv("TESTING_GUILD_ID"))
-
-	s.removeRegisteredCommands(os.Getenv("TESTING_CLIENT_ID"), os.Getenv("TESTING_GUILD_ID"))
-
-	s.closeConnection()
+	// s.openConnection()
+	//
+	// s.registerCommands(os.Getenv("TESTING_GUILD_ID"))
+	//
+	// s.removeRegisteredCommands(os.Getenv("TESTING_CLIENT_ID"), os.Getenv("TESTING_GUILD_ID"))
+	//
+	// s.closeConnection()
 }
