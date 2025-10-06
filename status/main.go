@@ -22,10 +22,10 @@ func MinecraftServerCheckRoutine(s *discord.Session) {
 		log.Printf("[INFO] No minecraft server ip has been provided. Disabling minecraft server status check.")
 		return
 	}
-	if minecraftServerIp != "localhost" && net.ParseIP(minecraftServerIp) == nil {
-		log.Printf("[ERROR] Invalid ip \"%s\" for minecraft server has been provided. Disabling minecraft server status check.", minecraftServerIp)
-		return
-	}
+	// if minecraftServerIp != "localhost" && net.ParseIP(minecraftServerIp) == nil {
+	// 	log.Printf("[ERROR] Invalid ip \"%s\" for minecraft server has been provided. Disabling minecraft server status check.", minecraftServerIp)
+	// 	return
+	// }
 
 	minecraftServerPort := 25565
 	if minecraftServerPortString != "" {
